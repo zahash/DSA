@@ -6,19 +6,24 @@ class Node():
 
     def __repr__(self):
         # return "{} | {}".format(self.data, self.next)
-        return f"data: {self.data}, next: {self.next.data}"
+        return "{}".format(self.data)
 
 
 class LinkedList():
     ''' A well tested implimentation of Linked List
         Warning: This code only works on Python versions
-                later than 3.6.0 because the code contains
+                above 3.6.0 because the code contains
                 f-strings
 
-        TODO: refactor the entire code to remove print statements and replace them with throwing errors
+        TODO: remove f-strings so that it is compatible with versions
+        below 3.6.0
 
-        also, add some functions like 'isempty()' that return something
+        TODO: Try adding a tail pointer so that insert() at
+        the end can be done at O(1) complexity instead of
+        iterating over the entire list to get to the last element
 
+        try to make all the functions except insert and delete to return something.
+        Eg: find() should return Index or None(Found | Not Found)
 
     '''
 
@@ -39,7 +44,7 @@ class LinkedList():
             return 0
 
     def insert(self, data, index=None):
-        # sanitary checks
+        # sanity checks
         assert type(index) is int or index is None, "Please enter an Integer index"
 
         if self.head is None:
@@ -63,24 +68,25 @@ class LinkedList():
                         curr = curr.next
                     curr.next = Node(data=data, next=curr.next)
 
-                except AttributeError:  # if index is out of range
-                    print(f"Index out of Range")
+                except AttributeError as inderr:  # if index is out of range
+                    raise IndexError("Index out of Range") from inderr
 
-                except TypeError:  # if index in not an integer (index is float)
-                    print(f"Please give a valid Integer Index")
+                # except TypeError as typeerr:  # if index in not an integer (index is float)
+                #     raise TypeError(f"Please give a valid Integer Index") from typeerr
 
             else:
-                print("Please give a valid positive Integer Index")
+                raise ValueError("Please give a valid positive Integer Index")
 
     def delete(self, data=None, index=None):
+        # sanity checks
+        assert type(index) is int or index is None, "Please enter an Integer index"
+
         if self.head is None:
             # Should I raise an error instead of just printing?
-            print("The LinkedList has no elements to delete")
-            return
+            raise Exception("The LinkedList has no elements to delete")
 
         if data is not None and index is not None:
-            print("You cannot give both data and index at the same time")
-            return
+            raise Exception("You cannot give both data and index at the same time")
 
         else:
             if index is None:  # delete the first occurance of data
@@ -91,7 +97,8 @@ class LinkedList():
                     del node_to_delete
                     return
 
-                # if required data is not at the beginning then search the list and delete if found
+                # if required data is not at the beginning then
+                # search the list and delete if found
                 curr = self.head
 
                 while curr.next is not None:
@@ -105,8 +112,8 @@ class LinkedList():
                     curr.next = curr.next.next
                     del node_to_delete
 
-                except AttributeError:  # element not found in the list
-                    print(f"The element '{data}' is not found in the list")
+                except AttributeError as notfounderr:  # element not found in the list
+                    raise Exception(f"The element '{data}' is not found in the list") from notfounderr
 
             elif index == 0:  # delete at the beginning
                 node_to_delete = self.head
@@ -123,26 +130,25 @@ class LinkedList():
                     curr.next = curr.next.next
                     del node_to_delete
 
-                except AttributeError:  # if index is out of range
-                    print(f"Index out of Range")
+                except AttributeError as inderr:  # if index is out of range
+                    raise IndexError(f"Index out of Range") from inderr
 
-                except TypeError:  # if index in not an integer
-                    print(f"Please give a valid Integer Index")
+                # except TypeError:  # if index in not an integer
+                #     print(f"Please give a valid Integer Index")
 
             else:
-                print("Please give a valid positive Integer Index")
+                raise ValueError("Please give a valid positive Integer Index")
 
-    def find(self, data):  # prints the first occurance of the element
+    def find(self, data):  # returns the index of the first occurance of data
         if self.head is None:
-            print("The LinkedList is empty")
-            return
+            raise Exception("The LinkedList is empty")
 
         curr = self.head
         index = 0
         while curr.next is not None:  # checks till the 2nd last element
             if curr.data == data:
                 print(f"Found at index: {index}")
-                return
+                return index
 
             curr = curr.next
             index += 1
@@ -150,19 +156,21 @@ class LinkedList():
         # checking the last element
         if curr.data == data:
             print(f"Found at index: {index}")
-            return
+            return index
 
         # else
         print("The element is not in the LinkedList")
+        return
 
     def fetch(self, index):  # returns the data at the specified index
+        # sanity check
+        assert type(index) is int, "Please enter an integer index"
+
         if self.head is None:
-            print("The LinkedList is empty")
-            return
+            raise Exception("The LinkedList is empty")
 
         if index < 0:
-            print("Please give a valid positive index")
-            return
+            raise ValueError("Please give a valid positive index")
 
         curr = self.head
         try:
@@ -171,9 +179,8 @@ class LinkedList():
 
             return curr.data
 
-        except AttributeError:
-            print("Index out of range")
-            return
+        except AttributeError as inderr:
+            raise IndexError("Index out of range") from inderr
 
     # nice representation for the interpreter
     def __repr__(self):
@@ -202,7 +209,7 @@ class LinkedListIterator():
         self.current = head
 
     def __next__(self):
-        if self.current == None:
+        if self.current is None:
             raise StopIteration
 
         else:
@@ -212,12 +219,4 @@ class LinkedListIterator():
 
 
 if __name__ == '__main__':
-    l = LinkedList()
-
-    l.insert(10)
-    l.insert(15)
-    l.insert(68)
-    l.insert(4)
-    l.insert(15)
-    l.insert(0)
-    l.insert(69)
+    l = LinkedList(5, 15, 68, 4, 15, 0, 69)
