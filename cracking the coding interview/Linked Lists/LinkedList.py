@@ -14,12 +14,34 @@ class LinkedList():
         Warning: This code only works on Python versions
                 later than 3.6.0 because the code contains
                 f-strings
+
+        TODO: refactor the entire code to remove print statements and replace them with throwing errors
+
+        also, add some functions like 'isempty()' that return something
+
+
     '''
 
-    def __init__(self):
+    def __init__(self, *args):
         self.head = None
 
+        if args:
+            self.head = Node(args[0])
+            curr = self.head
+            for ele in args[1:]:
+                curr.next = Node(ele)
+                curr = curr.next
+
+    def isempty(self):
+        if self.head is None:
+            return 1
+        else:
+            return 0
+
     def insert(self, data, index=None):
+        # sanitary checks
+        assert type(index) is int or index is None, "Please enter an Integer index"
+
         if self.head is None:
             self.head = Node(data)
 
@@ -44,7 +66,7 @@ class LinkedList():
                 except AttributeError:  # if index is out of range
                     print(f"Index out of Range")
 
-                except TypeError:  # if index in not an integer
+                except TypeError:  # if index in not an integer (index is float)
                     print(f"Please give a valid Integer Index")
 
             else:
@@ -153,15 +175,7 @@ class LinkedList():
             print("Index out of range")
             return
 
-    def reverse(self):  # recursive algorithm | returns new LinkedList
-        if self.head is None:
-            print("The LinkedList is empty")
-            return
-
-        # TODO: write base case
-
-        # TODO: write propagation case
-
+    # nice representation for the interpreter
     def __repr__(self):
         nodes_data = []
 
@@ -175,6 +189,26 @@ class LinkedList():
         nodes_data.append(str(curr.data))
 
         return ' -> '.join(nodes_data)
+
+    # iterator for "for-in" loops
+    def __iter__(self):
+        return LinkedListIterator(self.head)
+
+
+# Iterator class
+class LinkedListIterator():
+
+    def __init__(self, head):
+        self.current = head
+
+    def __next__(self):
+        if self.current == None:
+            raise StopIteration
+
+        else:
+            item = self.current.data
+            self.current = self.current.next
+            return item
 
 
 if __name__ == '__main__':
